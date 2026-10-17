@@ -1,0 +1,93 @@
+{
+  "mission_id": "mis_eed80799",
+  "goal": "Verify distributed locking invariant",
+  "status": "running",
+  "created_at": 1792249963632,
+  "steps_executed": 4,
+  "verifications_run": 11,
+  "verification_pass_rate": 0.55,
+  "claims_verified_count": 8,
+  "claims_unverified_count": 0,
+  "budget_consumed": {
+    "tokens": 100000,
+    "seconds": 600,
+    "tool_calls": 20,
+    "usd": 2,
+    "consumed": {
+      "tokens": 2516,
+      "seconds": 0,
+      "tool_calls": 4,
+      "usd": 0
+    }
+  },
+  "events_count": 43,
+  "chain_head_hash": "3c3e3176497f75cad79f8476dc02d3aadd9c969d8f4c42d2133edb182e45dc9b",
+  "tamper_evident_valid": false,
+  "artifacts": [
+    {
+      "hash": "106131316c500a8b59ce3100ae6cd4f57bed2558f00c18be2304bb65f9cd3721",
+      "name": "Verify distributed locking invar.md",
+      "mime": "text/markdown",
+      "producer_step": "step_4_synthesize"
+    }
+  ],
+  "claims": [
+    {
+      "id": "clm_1",
+      "text": "What problem or system are we building today?",
+      "evidence_ids": [],
+      "status": "verified",
+      "detail": "Verified against internal reasoning and structural invariants"
+    },
+    {
+      "id": "clm_2",
+      "text": "State the constraints or code requirements to begin.",
+      "evidence_ids": [],
+      "status": "verified",
+      "detail": "Verified against internal reasoning and structural invariants"
+    },
+    {
+      "id": "clm_3",
+      "text": "What problem or system are we building today?",
+      "evidence_ids": [],
+      "status": "verified",
+      "detail": "Verified against internal reasoning and structural invariants"
+    },
+    {
+      "id": "clm_4",
+      "text": "State the constraints or code requirements to begin.",
+      "evidence_ids": [],
+      "status": "verified",
+      "detail": "Verified against internal reasoning and structural invariants"
+    },
+    {
+      "id": "clm_5",
+      "text": "What problem or system are we building today?",
+      "evidence_ids": [],
+      "status": "verified",
+      "detail": "Verified against internal reasoning and structural invariants"
+    },
+    {
+      "id": "clm_6",
+      "text": "State the constraints or code requirements to begin.",
+      "evidence_ids": [],
+      "status": "verified",
+      "detail": "Verified against internal reasoning and structural invariants"
+    },
+    {
+      "id": "clm_7",
+      "text": "What problem or system are we building today?",
+      "evidence_ids": [],
+      "status": "verified",
+      "detail": "Verified against internal reasoning and structural invariants"
+    },
+    {
+      "id": "clm_8",
+      "text": "State the constraints or code requirements to begin.",
+      "evidence_ids": [],
+      "status": "verified",
+      "detail": "Verified against internal reasoning and structural invariants"
+    }
+  ],
+  "approvals": []
+}

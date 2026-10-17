@@ -30,6 +30,12 @@
   /* Aura Dynamic Energy: 0 to 1 */
   --energy: 0.25;
 
+  /* Surfaces & Special elements */
+  --code-bg: #0A0A0A;
+  --code-gutter: #080808;
+  --dock-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.7);
+  --modal-backdrop: rgba(0, 0, 0, 0.85);
+
   /* Aura bloom removed per user instruction for crisp dark obsidian */
   --bloom-color: rgba(0, 0, 0, 0);
   --bloom-color-subtle: rgba(0, 0, 0, 0);
@@ -37,21 +43,28 @@
   --grain-blend: overlay;
 }
 
-html.light {
+html.light,
+html:not(.dark) {
   /* Light Theme - Soft Ink Gray Bloom */
   --bg: #FFFFFF;
-  --elev-1: #F7F7F7;
-  --elev-2: #EFEFEF;
-  --elev-3: #E6E6E6;
+  --elev-1: #F7F7F8;
+  --elev-2: #EFEFF1;
+  --elev-3: #E5E5E8;
   --line: rgba(0, 0, 0, 0.08);
   --line-strong: rgba(0, 0, 0, 0.16);
-  --text: #0A0A0A;
-  --text-2: rgba(10, 10, 10, 0.62);
-  --text-3: rgba(10, 10, 10, 0.38);
+  --text: #0D0D0D;
+  --text-2: rgba(13, 13, 13, 0.68);
+  --text-3: rgba(13, 13, 13, 0.44);
+
+  /* Surfaces & Special elements for light mode */
+  --code-bg: #F6F6F8;
+  --code-gutter: #EBEBED;
+  --dock-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.08);
+  --modal-backdrop: rgba(255, 255, 255, 0.85);
 
   /* Light mode aura inversion */
-  --bloom-color: rgba(0, 0, 0, 0.08);
-  --bloom-color-subtle: rgba(0, 0, 0, 0.04);
-  --grain-opacity: 0.04;
-  --grain-blend: soft-light;
+  --bloom-color: rgba(0, 0, 0, 0.06);
+  --bloom-color-subtle: rgba(0, 0, 0, 0.03);
+  --grain-opacity: 0.03;
+  --grain-blend: multiply;
 }

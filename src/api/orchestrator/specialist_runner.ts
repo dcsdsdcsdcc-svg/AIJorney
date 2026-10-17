@@ -16,6 +16,8 @@ import { runPreRouter } from './pre_router.ts';
 import { boundConversationTurns, triggerAsyncSummaryUpdate } from './context_manager.ts';
 import { ToolRegistry } from '../tools/registry.ts';
 import { Store } from '../storage/store.ts';
+import { ArtifactStore } from '../storage/artifact_store.ts';
+import { VerifierRegistry } from '../verification/registry.ts';
 import { Telemetry, TurnTelemetry } from '../telemetry/telemetry.ts';
 import { scanForCanaryLeakage } from '../security/canary.ts';
 import crypto from 'node:crypto';
@@ -212,7 +214,7 @@ export async function executeChatTurn(
       fullOutputText = canaryResult.sanitizedText;
     }
 
-    // 8. Artifact Extraction (Extract fenced code or documents)
+    // 8. Artifact Extraction (Extract fenced code or documents) & Content-Addressed Store
     const artifacts: ArtifactEvent[] = [];
     const codeBlockRegex = /```([a-zA-Z0-9_\-]+)?\n([\s\S]*?)```/g;
     let match;
@@ -225,6 +227,14 @@ export async function executeChatTurn(
       const artId = `art_${turnId}_${artIdx++}`;
       const title = `${lang.toUpperCase()} Implementation`;
 
+      // Persist in Content-Addressed Store (SHA-256)
+      const storedBlob = ArtifactStore.put(
+        `${title.toLowerCase().replace(/\s+/g, '_')}.${lang}`,
+        code,
+        isHtmlOrComponent ? 'text/html' : 'text/plain',
+        selectedSpecialist
+      );
+
       const artEvent: ArtifactEvent = {
         id: artId,
         type,
@@ -234,7 +244,29 @@ export async function executeChatTurn(
         done: true,
       };
       artifacts.push(artEvent);
-      sendEvent('artifact', artEvent);
+      sendEvent('artifact', { ...artEvent, hash: storedBlob.hash });
+    }
+
+    // 8b. Verification Plane: Run verifiers & extract grounded claims
+    const stepSpecStub = {
+      id: `chat_turn_${turnId}`,
+      kind: 'generate' as const,
+      title: `${publicLens} Synthesis`,
+      agent: { role: 'executor' as const, domain: selectedSpecialist, tier: 'medium' as const },
+      inputs: { from_steps: [], artifacts: [] },
+      tools_allowed: needsTools,
+      verifiers: ['v1.schema.validation', 'v1.code.syntax', 'v4.critic.rubric'],
+      policy: { max_attempts: 1, timeout_s: 30, requires_approval: false },
+      idempotency_key: turnId,
+    };
+    const verifications = await VerifierRegistry.verifyStep(stepSpecStub, fullOutputText);
+    for (const v of verifications) {
+      sendEvent('verification', v);
+    }
+
+    const claims = VerifierRegistry.extractAndVerifyClaims(fullOutputText, []);
+    if (claims.length > 0) {
+      sendEvent('claims', { claims });
     }
 
     const t_total = Date.now() - startTime;

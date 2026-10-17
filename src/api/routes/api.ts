@@ -3,9 +3,13 @@ import {
   ChatRequestSchema,
   FeedbackRequestSchema,
   SPECIALIST_TO_LENS,
+  MissionSpecSchema,
 } from '../../../packages/contracts/index.ts';
 import { executeChatTurn } from '../orchestrator/specialist_runner.ts';
 import { Store } from '../storage/store.ts';
+import { EventStore } from '../storage/event_store.ts';
+import { ArtifactStore } from '../storage/artifact_store.ts';
+import { MissionRunner } from '../orchestrator/mission_runner.ts';
 import { GlobalRateLimiter } from '../security/rate_limiter.ts';
 import { logAudit } from '../security/audit.ts';
 import { indexDocument, getIndexedDocuments } from '../tools/retrieval.ts';
@@ -247,4 +251,196 @@ apiRouter.post('/evals/run', async (_req: Request, res: Response) => {
   const { runEvaluationHarness } = await import('../../../packages/evals/eval_harness.ts');
   const report = await runEvaluationHarness();
   res.json(report);
+});
+
+// ============================================================================
+// MISSION ARCHITECTURE REST & SSE ENDPOINTS (Section 17)
+// ============================================================================
+
+// POST /v1/missions
+apiRouter.post('/missions', async (req: Request, res: Response) => {
+  try {
+    const validated = MissionSpecSchema.parse(req.body);
+    const missionId = await MissionRunner.startMission(validated);
+    const mission = EventStore.getMission(missionId);
+    res.status(201).json({ mission_id: missionId, mission });
+  } catch (err: any) {
+    res.status(400).json({ error: 'INVALID_MISSION_SPEC', message: err.message });
+  }
+});
+
+// GET /v1/missions
+apiRouter.get('/missions', (_req: Request, res: Response) => {
+  res.json({ missions: EventStore.listMissions() });
+});
+
+// GET /v1/missions/:id
+apiRouter.get('/missions/:id', (req: Request, res: Response) => {
+  const mission = EventStore.getMission(req.params.id);
+  if (!mission) {
+    return res.status(404).json({ error: 'MISSION_NOT_FOUND' });
+  }
+  res.json({ mission });
+});
+
+// GET /v1/missions/:id/stream (SSE)
+apiRouter.get('/missions/:id/stream', (req: Request, res: Response) => {
+  const missionId = req.params.id;
+  const mission = EventStore.getMission(missionId);
+  if (!mission) {
+    return res.status(404).json({ error: 'MISSION_NOT_FOUND' });
+  }
+
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache, no-transform');
+  res.setHeader('Connection', 'keep-alive');
+  res.setHeader('X-Accel-Buffering', 'no');
+  res.flushHeaders?.();
+
+  // Send initial snapshot
+  res.write(`event: snapshot\ndata: ${JSON.stringify(mission)}\n\n`);
+
+  // Stream new events
+  const unsubscribe = EventStore.subscribe(missionId, (event) => {
+    if (!res.writableEnded) {
+      res.write(`event: ${event.type}\ndata: ${JSON.stringify(event)}\nid: ${event.seq}\n\n`);
+    }
+  });
+
+  const heartbeat = setInterval(() => {
+    if (!res.writableEnded) {
+      res.write(': heartbeat\n\n');
+    }
+  }, 15000);
+
+  res.on('close', () => {
+    clearInterval(heartbeat);
+    unsubscribe();
+  });
+});
+
+// POST /v1/missions/:id/cancel
+apiRouter.post('/missions/:id/cancel', (req: Request, res: Response) => {
+  const mission = EventStore.getMission(req.params.id);
+  if (!mission) {
+    return res.status(404).json({ error: 'MISSION_NOT_FOUND' });
+  }
+  EventStore.appendEvent(req.params.id, 'MissionCancelled', { reason: req.body?.reason || 'User cancelled' }, 'user:client');
+  res.json({ success: true, state: 'cancelled' });
+});
+
+// POST /v1/missions/:id/resume
+apiRouter.post('/missions/:id/resume', (req: Request, res: Response) => {
+  const mission = EventStore.getMission(req.params.id);
+  if (!mission) {
+    return res.status(404).json({ error: 'MISSION_NOT_FOUND' });
+  }
+  EventStore.appendEvent(req.params.id, 'MissionResumed', { reason: 'User resumed' }, 'user:client');
+  MissionRunner.executeMissionDAG(req.params.id).catch((err) => {
+    console.error('[MissionRunner] Resume error:', err);
+  });
+  res.json({ success: true, state: 'running' });
+});
+
+// GET /v1/missions/:id/plan
+apiRouter.get('/missions/:id/plan', (req: Request, res: Response) => {
+  const mission = EventStore.getMission(req.params.id);
+  if (!mission || !mission.plan) {
+    return res.status(404).json({ error: 'PLAN_NOT_FOUND' });
+  }
+  res.json({ plan: mission.plan });
+});
+
+// PUT /v1/missions/:id/plan (Human Edit)
+apiRouter.put('/missions/:id/plan', (req: Request, res: Response) => {
+  const mission = EventStore.getMission(req.params.id);
+  if (!mission) {
+    return res.status(404).json({ error: 'MISSION_NOT_FOUND' });
+  }
+  EventStore.appendEvent(req.params.id, 'PlanEdited', { plan: req.body.plan, reason: req.body.reason }, 'user:editor');
+  res.json({ success: true });
+});
+
+// POST /v1/missions/:id/approvals/:approval_id
+apiRouter.post('/missions/:id/approvals/:approval_id', (req: Request, res: Response) => {
+  const { decision, note } = req.body;
+  if (!['approved', 'rejected'].includes(decision)) {
+    return res.status(400).json({ error: 'INVALID_DECISION' });
+  }
+  EventStore.appendEvent(req.params.id, 'ApprovalDecided', {
+    approval_id: req.params.approval_id,
+    decision,
+    note,
+    user: 'client',
+  }, 'user:client');
+
+  if (decision === 'approved') {
+    MissionRunner.executeMissionDAG(req.params.id).catch((err) => {
+      console.error('[MissionRunner] Execution after approval error:', err);
+    });
+  }
+
+  res.json({ success: true });
+});
+
+// GET /v1/missions/:id/events
+apiRouter.get('/missions/:id/events', (req: Request, res: Response) => {
+  const afterSeq = Number(req.query.after_seq || '0');
+  const events = EventStore.getEvents(req.params.id, afterSeq);
+  res.json({ events });
+});
+
+// GET /v1/missions/:id/artifacts
+apiRouter.get('/missions/:id/artifacts', (req: Request, res: Response) => {
+  const mission = EventStore.getMission(req.params.id);
+  if (!mission) {
+    return res.status(404).json({ error: 'MISSION_NOT_FOUND' });
+  }
+  res.json({ artifacts: mission.artifacts });
+});
+
+// GET /v1/artifacts/:hash
+apiRouter.get('/artifacts/:hash', (req: Request, res: Response) => {
+  const artifact = ArtifactStore.get(req.params.hash);
+  if (!artifact) {
+    return res.status(404).json({ error: 'ARTIFACT_NOT_FOUND' });
+  }
+  res.setHeader('Content-Type', artifact.mime || 'text/plain');
+  res.send(artifact.content);
+});
+
+// GET /v1/missions/:id/claims
+apiRouter.get('/missions/:id/claims', (req: Request, res: Response) => {
+  const mission = EventStore.getMission(req.params.id);
+  if (!mission) {
+    return res.status(404).json({ error: 'MISSION_NOT_FOUND' });
+  }
+  res.json({ claims: mission.claims });
+});
+
+// GET /v1/missions/:id/audit
+apiRouter.get('/missions/:id/audit', (req: Request, res: Response) => {
+  const audit = EventStore.generateAuditReport(req.params.id);
+  if (!audit) {
+    return res.status(404).json({ error: 'AUDIT_NOT_FOUND' });
+  }
+  if (req.query.format === 'markdown') {
+    let md = `# Audit Report: Mission ${audit.mission_id}\n\n`;
+    md += `**Goal:** ${audit.goal}\n`;
+    md += `**Status:** ${audit.status}\n`;
+    md += `**Hash Chain Head:** \`${audit.chain_head_hash}\`\n`;
+    md += `**Tamper-Evidence Verified:** ${audit.tamper_evident_valid ? 'YES' : 'FAILED'}\n`;
+    md += `**Steps Executed:** ${audit.steps_executed} | **Verifications Run:** ${audit.verifications_run} (${Math.round(audit.verification_pass_rate * 100)}% pass rate)\n\n`;
+    md += `### Claims Verification\n`;
+    for (const c of audit.claims) {
+      md += `- [${c.status.toUpperCase()}] "${c.text}" — *${c.detail || ''}*\n`;
+    }
+    md += `\n### Artifacts Produced\n`;
+    for (const a of audit.artifacts) {
+      md += `- \`${a.hash.slice(0, 12)}...\` : ${a.name} (${a.mime})\n`;
+    }
+    res.setHeader('Content-Type', 'text/markdown; charset=utf-8');
+    return res.send(md);
+  }
+  res.json({ audit });
 });

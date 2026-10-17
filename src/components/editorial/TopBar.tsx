@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useChatStore } from '../../lib/store.ts';
+import { getStoredTheme, toggleTheme } from '../../lib/theme.ts';
 import {
   Plus,
   MessageSquare,
@@ -12,6 +13,8 @@ import {
   ChevronDown,
   Trash2,
   Menu,
+  Sun,
+  Moon,
 } from 'lucide-react';
 
 export const TopBar: React.FC = () => {
@@ -32,8 +35,20 @@ export const TopBar: React.FC = () => {
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [titleInput, setTitleInput] = useState('');
   const [isQuickChatsOpen, setIsQuickChatsOpen] = useState(false);
+  const [currentTheme, setCurrentTheme] = useState<'dark' | 'light'>('dark');
   const inputRef = useRef<HTMLInputElement>(null);
   const quickChatsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const updateThemeState = () => {
+      const isDark = document.documentElement.classList.contains('dark');
+      setCurrentTheme(isDark ? 'dark' : 'light');
+    };
+    updateThemeState();
+    const observer = new MutationObserver(updateThemeState);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
 
   const activeSpace = conversations.find((c) => c.id === activeId);
 
@@ -61,8 +76,12 @@ export const TopBar: React.FC = () => {
     setIsQuickChatsOpen(false);
   };
 
+  const handleToggleTheme = () => {
+    toggleTheme();
+  };
+
   return (
-    <header className="fixed top-0 inset-x-0 h-13 z-40 px-4 sm:px-6 flex items-center justify-between border-b border-[var(--line)] bg-[#000000]/95 backdrop-blur-md shadow-md select-none">
+    <header className="fixed top-0 inset-x-0 h-13 z-40 px-4 sm:px-6 flex items-center justify-between border-b border-[var(--line)] bg-[var(--bg)]/90 backdrop-blur-md shadow-xs select-none">
       {/* Left: Brand + Prominent "+ New Chat" + "Chats Menu" */}
       <div className="flex items-center gap-2 sm:gap-3">
         {/* Brand */}
@@ -107,7 +126,7 @@ export const TopBar: React.FC = () => {
 
           {/* Quick Chat Switcher Dropdown */}
           {isQuickChatsOpen && (
-            <div className="absolute left-0 top-full mt-2 w-72 sm:w-80 rounded-[16px] bg-[#0A0A0A] border border-[var(--line-strong)] shadow-2xl p-2 z-50 animate-[wordReveal_140ms_ease-out]">
+            <div className="absolute left-0 top-full mt-2 w-72 sm:w-80 rounded-[16px] bg-[var(--elev-1)] border border-[var(--line-strong)] shadow-2xl p-2 z-50 animate-[wordReveal_140ms_ease-out]">
               <div className="px-2.5 py-1.5 flex items-center justify-between border-b border-[var(--line)] mb-1">
                 <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--text-3)]">
                   Your Spaces ({conversations.length})
@@ -247,11 +266,24 @@ export const TopBar: React.FC = () => {
           <kbd className="text-[9px] text-[var(--text-3)] ml-0.5">⌘K</kbd>
         </button>
 
+        {/* Light / Dark Mode Toggle */}
+        <button
+          onClick={handleToggleTheme}
+          className="w-8 h-8 rounded-full border border-[var(--line)] flex items-center justify-center text-[var(--text-2)] hover:text-[var(--text)] hover:bg-[var(--elev-1)] transition-colors"
+          title={currentTheme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+        >
+          {currentTheme === 'dark' ? (
+            <Sun className="w-3.5 h-3.5 transition-transform hover:rotate-45" />
+          ) : (
+            <Moon className="w-3.5 h-3.5 transition-transform hover:-rotate-12" />
+          )}
+        </button>
+
         {/* Settings Button */}
         <button
           onClick={() => setSettingsOpen(true)}
           className="w-8 h-8 rounded-full flex items-center justify-center text-[var(--text-2)] hover:text-[var(--text)] hover:bg-[var(--elev-1)] transition-colors"
-          title="Preferences & Settings (Lists, Paragraphs, Code theme)"
+          title="Preferences & Settings (Theme, Lists, Paragraphs, Code theme)"
         >
           <Sliders className="w-3.5 h-3.5" />
         </button>

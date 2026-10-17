@@ -137,9 +137,9 @@ export const CodeEditorBlock: React.FC<CodeEditorBlockProps> = ({ code, language
     codeFontSize === 'sm' ? 'text-[12px]' : codeFontSize === 'lg' ? 'text-[14.5px]' : 'text-[13px]';
 
   return (
-    <div className="my-6 rounded-[14px] bg-[#0A0A0A] border border-[var(--line-strong)] overflow-hidden shadow-2xl transition-all duration-150 group">
+    <div className="my-6 rounded-[14px] bg-[var(--elev-1)] border border-[var(--line-strong)] overflow-hidden shadow-2xl transition-all duration-150 group">
       {/* 1. Real Code Editor Window Chrome / Title Bar */}
-      <div className="h-10 px-4 border-b border-[var(--line)] flex items-center justify-between bg-[#111111] select-none">
+      <div className="h-10 px-4 border-b border-[var(--line)] flex items-center justify-between bg-[var(--elev-2)] select-none">
         {/* Left: Window Dots & Active Tab */}
         <div className="flex items-center gap-3 min-w-0">
           {/* Traffic Window Buttons */}
@@ -150,7 +150,7 @@ export const CodeEditorBlock: React.FC<CodeEditorBlockProps> = ({ code, language
           </div>
 
           {/* Editor File Tab */}
-          <div className="flex items-center gap-2 px-3 py-1 rounded-[6px] bg-[#0A0A0A] border border-[var(--line)] text-[12px] font-mono text-[var(--text)] shrink-0 shadow-xs">
+          <div className="flex items-center gap-2 px-3 py-1 rounded-[6px] bg-[var(--elev-1)] border border-[var(--line)] text-[12px] font-mono text-[var(--text)] shrink-0 shadow-xs">
             <FileCode className="w-3.5 h-3.5 text-[var(--text-3)]" />
             <span className="font-medium">{displayFilename}</span>
           </div>
@@ -215,11 +215,11 @@ export const CodeEditorBlock: React.FC<CodeEditorBlockProps> = ({ code, language
       </div>
 
       {/* 2. Editor Gutter & Code Body with Syntax Styling */}
-      <div className="relative flex overflow-x-auto bg-[#050505] text-[var(--text)] font-mono">
+      <div className="relative flex overflow-x-auto bg-[var(--code-bg)] text-[var(--text)] font-mono">
         {/* Line Numbers Gutter */}
         {showLineNumbers && (
           <div
-            className="shrink-0 py-3.5 px-3 text-right select-none font-mono text-[11px] text-[var(--text-3)] border-r border-[var(--line)] bg-[#080808]"
+            className="shrink-0 py-3.5 px-3 text-right select-none font-mono text-[11px] text-[var(--text-3)] border-r border-[var(--line)] bg-[var(--code-gutter)]"
             aria-hidden="true"
           >
             {lines.map((_, i) => (
@@ -246,7 +246,7 @@ export const CodeEditorBlock: React.FC<CodeEditorBlockProps> = ({ code, language
               key={lineIdx}
               onMouseEnter={() => setActiveLine(lineIdx)}
               onMouseLeave={() => setActiveLine(null)}
-              className={`hover:bg-[#121212] transition-colors rounded-[2px] px-1 -mx-1`}
+              className={`hover:bg-[var(--elev-2)] transition-colors rounded-[2px] px-1 -mx-1`}
             >
               {highlightCodeLine(lineText, lang)}
             </div>
@@ -255,7 +255,7 @@ export const CodeEditorBlock: React.FC<CodeEditorBlockProps> = ({ code, language
       </div>
 
       {/* 3. Editor Status Bar at Bottom */}
-      <div className="h-6 px-4 border-t border-[var(--line)] flex items-center justify-between bg-[#0E0E0E] text-[10px] font-mono text-[var(--text-3)] select-none">
+      <div className="h-6 px-4 border-t border-[var(--line)] flex items-center justify-between bg-[var(--elev-2)] text-[10px] font-mono text-[var(--text-3)] select-none">
         <div className="flex items-center gap-3">
           <span>{lines.length} lines</span>
           <span>{cleanCode.length} chars</span>

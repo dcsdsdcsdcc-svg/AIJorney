@@ -61,5 +61,41 @@
     "content": "How do I implement an in-memory token bucket rate limiter in TypeScript?",
     "attachments": [],
     "created_at": 1792237707747
+  },
+  {
+    "id": "e5a7a970-1aee-4c16-a244-b8c0910725ab",
+    "conversation_id": "test_conv",
+    "parent_id": null,
+    "role": "user",
+    "content": "Hello Noevix",
+    "attachments": [],
+    "created_at": 1792249303356
+  },
+  {
+    "id": "50ef7b61-a17c-4bf8-8c72-fc18c05fa116",
+    "conversation_id": "test_conv",
+    "parent_id": "e5a7a970-1aee-4c16-a244-b8c0910725ab",
+    "role": "assistant",
+    "content": "The implementation uses an in-memory sliding window algorithm with monotonic millisecond timestamps to enforce strict concurrency limits without background timer drift.\n\n```typescript\nexport interface RateLimitOptions {\n  windowMs: number;\n  maxRequests: number;\n}\n\nexport class SlidingWindowLimiter {\n  private timestamps: number[] = [];\n\n  constructor(private readonly options: RateLimitOptions) {}\n\n  public isAllowed(now = Date.now()): { allowed: boolean; remaining: number } {\n    const windowStart = now - this.options.windowMs;\n    this.timestamps = this.timestamps.filter((ts) => ts > windowStart);\n\n    if (this.timestamps.length < this.options.maxRequests) {\n      this.timestamps.push(now);\n      return {\n        allowed: true,\n        remaining: this.options.maxRequests - this.timestamps.length,\n      };\n    }\n\n    return { allowed: false, remaining: 0 };\n  }\n}\n```\n\nWhat breaks:\n- Memory footprint grows linearly with high RPS if timestamps array is not pruned on read.\n- Clock skew across multi-tenant servers can cause edge boundary jitter.",
+    "lens": "Engineering",
+    "artifacts": [
+      {
+        "id": "art_ba608405-1a09-466c-bc06-f4dd405d89d5_1",
+        "type": "code",
+        "title": "TYPESCRIPT Implementation",
+        "language": "typescript",
+        "content": "export interface RateLimitOptions {\n  windowMs: number;\n  maxRequests: number;\n}\n\nexport class SlidingWindowLimiter {\n  private timestamps: number[] = [];\n\n  constructor(private readonly options: RateLimitOptions) {}\n\n  public isAllowed(now = Date.now()): { allowed: boolean; remaining: number } {\n    const windowStart = now - this.options.windowMs;\n    this.timestamps = this.timestamps.filter((ts) => ts > windowStart);\n\n    if (this.timestamps.length < this.options.maxRequests) {\n      this.timestamps.push(now);\n      return {\n        allowed: true,\n        remaining: this.options.maxRequests - this.timestamps.length,\n      };\n    }\n\n    return { allowed: false, remaining: 0 };\n  }\n}\n",
+        "done": true
+      }
+    ],
+    "created_at": 1792249307675,
+    "usage": {
+      "tokens_in": 1221,
+      "tokens_out": 265,
+      "cached_tokens": 132,
+      "ms_total": 4319,
+      "ms_first_token": 13,
+      "t_route": 5
+    }
   }
 ]

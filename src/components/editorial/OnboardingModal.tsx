@@ -101,15 +101,15 @@ export const OnboardingModal: React.FC = () => {
   const activeLensItem = LENSES_INFO.find((l) => l.id === selectedLensDemo) || LENSES_INFO[0];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/85 backdrop-blur-2xl select-none animate-[wordReveal_200ms_ease-out]">
-      <div className="relative w-full max-w-2xl rounded-[24px] bg-[#0A0A0A] border border-[var(--line-strong)] shadow-2xl overflow-hidden flex flex-col justify-between min-h-[540px]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/60 dark:bg-black/85 backdrop-blur-2xl select-none animate-[wordReveal_200ms_ease-out]">
+      <div className="relative w-full max-w-2xl rounded-[24px] bg-[var(--elev-1)] border border-[var(--line-strong)] shadow-2xl overflow-hidden flex flex-col justify-between min-h-[540px]">
         {/* Top Progress Bar */}
-        <div className="p-5 px-6 border-b border-[var(--line)] bg-[#0E0E0E] flex items-center justify-between">
+        <div className="p-5 px-6 border-b border-[var(--line)] bg-[var(--elev-2)] flex items-center justify-between">
           <div className="flex items-center gap-3">
             <span className="font-serif-display text-2xl text-[var(--text)] tracking-tight">
               Noevix
             </span>
-            <span className="font-mono text-[10px] uppercase px-2 py-0.5 rounded-[4px] bg-[#161616] text-[var(--text-3)] border border-[var(--line)]">
+            <span className="font-mono text-[10px] uppercase px-2 py-0.5 rounded-[4px] bg-[var(--elev-3)] text-[var(--text-3)] border border-[var(--line)]">
               ONBOARDING {step} OF {totalSteps}
             </span>
           </div>
@@ -145,7 +145,7 @@ export const OnboardingModal: React.FC = () => {
                 Light in a dark room.
               </h2>
 
-              <div className="p-4 rounded-[12px] bg-[#111111] border border-[var(--line)] font-mono text-[14px] text-[var(--text)] min-h-[54px] flex items-center">
+              <div className="p-4 rounded-[12px] bg-[var(--elev-2)] border border-[var(--line)] font-mono text-[14px] text-[var(--text)] min-h-[54px] flex items-center">
                 <span>{typingText}</span>
                 <span className="inline-block w-2 h-4 bg-[var(--text)] ml-1 animate-pulse" />
               </div>
@@ -177,8 +177,8 @@ export const OnboardingModal: React.FC = () => {
                   onClick={() => setOutputStyle('lists')}
                   className={`p-5 rounded-[16px] border text-left transition-all flex flex-col justify-between min-h-[140px] ${
                     outputStyle === 'lists'
-                      ? 'bg-[#141414] border-[var(--text)] text-[var(--text)] shadow-sm'
-                      : 'bg-[#0E0E0E] border-[var(--line)] text-[var(--text-2)] hover:border-[var(--line-strong)]'
+                      ? 'bg-[var(--elev-3)] border-[var(--text)] text-[var(--text)] shadow-sm'
+                      : 'bg-[var(--elev-2)] border-[var(--line)] text-[var(--text-2)] hover:border-[var(--line-strong)]'
                   }`}
                 >
                   <div className="flex items-center justify-between">
@@ -201,8 +201,8 @@ export const OnboardingModal: React.FC = () => {
                   onClick={() => setOutputStyle('paragraphs')}
                   className={`p-5 rounded-[16px] border text-left transition-all flex flex-col justify-between min-h-[140px] ${
                     outputStyle === 'paragraphs'
-                      ? 'bg-[#141414] border-[var(--text)] text-[var(--text)] shadow-sm'
-                      : 'bg-[#0E0E0E] border-[var(--line)] text-[var(--text-2)] hover:border-[var(--line-strong)]'
+                      ? 'bg-[var(--elev-3)] border-[var(--text)] text-[var(--text)] shadow-sm'
+                      : 'bg-[var(--elev-2)] border-[var(--line)] text-[var(--text-2)] hover:border-[var(--line-strong)]'
                   }`}
                 >
                   <div className="flex items-center justify-between">
@@ -252,8 +252,8 @@ export const OnboardingModal: React.FC = () => {
                       }}
                       className={`w-full p-2.5 px-3 rounded-[10px] border flex items-center justify-between transition-all text-left ${
                         isSelected
-                          ? 'bg-[#161616] border-[var(--text)] text-[var(--text)]'
-                          : 'bg-[#0E0E0E] border-[var(--line)] text-[var(--text-2)] hover:bg-[#121212]'
+                          ? 'bg-[var(--elev-3)] border-[var(--text)] text-[var(--text)]'
+                          : 'bg-[var(--elev-2)] border-[var(--line)] text-[var(--text-2)] hover:bg-[var(--elev-3)]'
                       }`}
                     >
                       <div className="flex items-center gap-3">
@@ -270,7 +270,7 @@ export const OnboardingModal: React.FC = () => {
               </div>
 
               {/* Sample Output Preview Box */}
-              <div className="p-3 rounded-[8px] bg-[#070707] border border-[var(--line)] font-mono text-[11px] text-[var(--text-2)]">
+              <div className="p-3 rounded-[8px] bg-[var(--elev-2)] border border-[var(--line)] font-mono text-[11px] text-[var(--text-2)]">
                 <span className="text-[var(--text-3)] uppercase block mb-1">Preview Protocol Signature:</span>
                 <code>{activeLensItem.example}</code>
               </div>
@@ -293,7 +293,7 @@ export const OnboardingModal: React.FC = () => {
               </div>
 
               <div className="grid grid-cols-2 gap-3 text-[12px] font-mono text-[var(--text-2)]">
-                <div className="p-3 rounded-[12px] bg-[#0E0E0E] border border-[var(--line)]">
+                <div className="p-3 rounded-[12px] bg-[var(--elev-2)] border border-[var(--line)]">
                   <span className="text-[var(--text)] font-semibold block mb-0.5 flex items-center gap-1.5">
                     <MessageSquare className="w-3.5 h-3.5" />
                     <span>New Chat & Chats Menu</span>
@@ -302,7 +302,7 @@ export const OnboardingModal: React.FC = () => {
                     Use the Top Bar "+ New Chat" and "Chats" menu to create and switch conversations.
                   </p>
                 </div>
-                <div className="p-3 rounded-[12px] bg-[#0E0E0E] border border-[var(--line)]">
+                <div className="p-3 rounded-[12px] bg-[var(--elev-2)] border border-[var(--line)]">
                   <span className="text-[var(--text)] font-semibold block mb-0.5 flex items-center gap-1.5">
                     <Code className="w-3.5 h-3.5" />
                     <span>Code Editor Blocks</span>
@@ -311,7 +311,7 @@ export const OnboardingModal: React.FC = () => {
                     Code displays in real editor windows with line numbers, syntax weights, and full sheets.
                   </p>
                 </div>
-                <div className="p-3 rounded-[12px] bg-[#0E0E0E] border border-[var(--line)]">
+                <div className="p-3 rounded-[12px] bg-[var(--elev-2)] border border-[var(--line)]">
                   <span className="text-[var(--text)] font-semibold block mb-0.5 flex items-center gap-1.5">
                     <Sliders className="w-3.5 h-3.5" />
                     <span>Settings & Formatting</span>
@@ -320,7 +320,7 @@ export const OnboardingModal: React.FC = () => {
                     Toggle Lists vs Paragraphs, font size, and detail level anytime in Settings.
                   </p>
                 </div>
-                <div className="p-3 rounded-[12px] bg-[#0E0E0E] border border-[var(--line)]">
+                <div className="p-3 rounded-[12px] bg-[var(--elev-2)] border border-[var(--line)]">
                   <span className="text-[var(--text)] font-semibold block mb-0.5 flex items-center gap-1.5">
                     <Command className="w-3.5 h-3.5" />
                     <span>Index & Lens Keys</span>
@@ -335,7 +335,7 @@ export const OnboardingModal: React.FC = () => {
         </div>
 
         {/* Footer Navigation */}
-        <div className="p-5 px-6 border-t border-[var(--line)] bg-[#0E0E0E] flex items-center justify-between">
+        <div className="p-5 px-6 border-t border-[var(--line)] bg-[var(--elev-2)] flex items-center justify-between">
           <button
             onClick={completeOnboarding}
             className="text-[12px] font-mono text-[var(--text-3)] hover:text-[var(--text)] transition-colors"
@@ -347,7 +347,7 @@ export const OnboardingModal: React.FC = () => {
             {step > 1 && (
               <button
                 onClick={() => setStep(step - 1)}
-                className="px-4 py-2 rounded-[9999px] border border-[var(--line)] text-[12px] font-mono text-[var(--text-2)] hover:text-[var(--text)] hover:bg-[#151515]"
+                className="px-4 py-2 rounded-[9999px] border border-[var(--line)] text-[12px] font-mono text-[var(--text-2)] hover:text-[var(--text)] hover:bg-[var(--elev-3)]"
               >
                 Back
               </button>

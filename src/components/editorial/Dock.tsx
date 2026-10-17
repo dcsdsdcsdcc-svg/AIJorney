@@ -302,7 +302,7 @@ export const Dock: React.FC = () => {
                     setInput(starter.prompt);
                     textareaRef.current?.focus();
                   }}
-                  className="px-3 py-1.5 rounded-[9999px] bg-[#0E0E0E] hover:bg-[#161616] border border-[var(--line)] text-[12px] text-[var(--text-2)] hover:text-[var(--text)] transition-colors"
+                  className="px-3 py-1.5 rounded-[9999px] bg-[var(--elev-1)] hover:bg-[var(--elev-2)] border border-[var(--line)] text-[12px] text-[var(--text-2)] hover:text-[var(--text)] transition-colors"
                 >
                   {starter.label}
                 </button>
@@ -321,11 +321,11 @@ export const Dock: React.FC = () => {
           </div>
         )}
 
-        {/* The Dock Container - Crisp obsidian shell without white glow */}
-        <div className="relative w-full rounded-[24px] bg-[#0A0A0A] border border-[var(--line-strong)] dock-outer-glow shadow-2xl transition-all duration-200">
+        {/* The Dock Container - Crisp responsive shell with dynamic theme styling */}
+        <div className="relative w-full rounded-[24px] bg-[var(--elev-1)] border border-[var(--line-strong)] dock-outer-glow shadow-2xl transition-all duration-200">
           {/* Top Formatting & Assistant Toolbar if toggled */}
           {showToolbar && (
-            <div className="px-4 py-2 border-b border-[var(--line)] flex items-center justify-between text-[11px] font-mono text-[var(--text-3)] bg-[#0F0F0F] rounded-t-[24px] flex-wrap gap-2">
+            <div className="px-4 py-2 border-b border-[var(--line)] flex items-center justify-between text-[11px] font-mono text-[var(--text-3)] bg-[var(--elev-2)] rounded-t-[24px] flex-wrap gap-2">
               <div className="flex items-center gap-1 flex-wrap">
                 <button
                   onClick={() => insertFormatting('**', '**')}
@@ -409,7 +409,7 @@ export const Dock: React.FC = () => {
               {attachments.map((att) => (
                 <div
                   key={att.id}
-                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-[6px] bg-[#141414] text-[12px] font-mono text-[var(--text-2)] border border-[var(--line)]"
+                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-[6px] bg-[var(--elev-2)] text-[12px] font-mono text-[var(--text-2)] border border-[var(--line)]"
                 >
                   <span className="truncate max-w-[140px]">{att.name}</span>
                   <span className="text-[10px] text-[var(--text-3)]">({Math.round(att.size / 1024)}kb)</span>
@@ -461,7 +461,7 @@ export const Dock: React.FC = () => {
               />
               <button
                 onClick={() => fileInputRef.current?.click()}
-                className="w-8 h-8 rounded-full flex items-center justify-center text-[var(--text-3)] hover:text-[var(--text)] hover:bg-[#141414] transition-colors"
+                className="w-8 h-8 rounded-full flex items-center justify-center text-[var(--text-3)] hover:text-[var(--text)] hover:bg-[var(--elev-2)] transition-colors"
                 title="Attach context file or code snippet"
               >
                 <Paperclip className="w-4 h-4" />
@@ -472,8 +472,8 @@ export const Dock: React.FC = () => {
                 onClick={() => setShowToolbar(!showToolbar)}
                 className={`px-2 py-1 rounded-[6px] text-[11px] font-mono transition-colors ${
                   showToolbar
-                    ? 'bg-[#181818] text-[var(--text)] font-semibold'
-                    : 'text-[var(--text-3)] hover:text-[var(--text)] hover:bg-[#141414]'
+                    ? 'bg-[var(--elev-3)] text-[var(--text)] font-semibold'
+                    : 'text-[var(--text-3)] hover:text-[var(--text)] hover:bg-[var(--elev-2)]'
                 }`}
                 title="Formatting toolbar (Bold, Code, Lists, Tables)"
               >
@@ -486,7 +486,7 @@ export const Dock: React.FC = () => {
                   const next = outputStyle === 'lists' ? 'paragraphs' : outputStyle === 'paragraphs' ? 'code_first' : 'lists';
                   setOutputStyle(next);
                 }}
-                className="flex items-center gap-1.5 px-2.5 py-1 rounded-[9999px] bg-[#121212] hover:bg-[#181818] border border-[var(--line)] text-[11px] font-mono text-[var(--text-2)] hover:text-[var(--text)] transition-colors"
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-[9999px] bg-[var(--elev-2)] hover:bg-[var(--elev-3)] border border-[var(--line)] text-[11px] font-mono text-[var(--text-2)] hover:text-[var(--text)] transition-colors"
                 title={`Click to switch format: currently ${outputStyle.toUpperCase()}`}
               >
                 {outputStyle === 'lists' ? (
@@ -503,7 +503,7 @@ export const Dock: React.FC = () => {
               <div className="relative" ref={presetsRef}>
                 <button
                   onClick={() => setShowPresets(!showPresets)}
-                  className="flex items-center gap-1 px-2.5 py-1 rounded-[9999px] bg-[#121212] hover:bg-[#181818] border border-[var(--line)] text-[11px] font-mono text-[var(--text-3)] hover:text-[var(--text)] transition-colors"
+                  className="flex items-center gap-1 px-2.5 py-1 rounded-[9999px] bg-[var(--elev-2)] hover:bg-[var(--elev-3)] border border-[var(--line)] text-[11px] font-mono text-[var(--text-3)] hover:text-[var(--text)] transition-colors"
                   title="Prompt templates"
                 >
                   <Sparkles className="w-3 h-3" />
@@ -511,7 +511,7 @@ export const Dock: React.FC = () => {
                 </button>
 
                 {showPresets && (
-                  <div className="absolute left-0 bottom-full mb-2 w-72 sm:w-80 p-2 rounded-[16px] bg-[#0A0A0A] border border-[var(--line-strong)] shadow-2xl backdrop-blur-xl z-50 animate-[wordReveal_140ms_ease-out]">
+                  <div className="absolute left-0 bottom-full mb-2 w-72 sm:w-80 p-2 rounded-[16px] bg-[var(--elev-1)] border border-[var(--line-strong)] shadow-2xl backdrop-blur-xl z-50 animate-[wordReveal_140ms_ease-out]">
                     <div className="px-2 py-1 text-[10px] font-mono uppercase tracking-wider text-[var(--text-3)]">
                       Architectural Invariants & Presets
                     </div>
@@ -524,7 +524,7 @@ export const Dock: React.FC = () => {
                             setShowPresets(false);
                             textareaRef.current?.focus();
                           }}
-                          className="w-full text-left p-2 rounded-[8px] hover:bg-[#141414] text-[12px] text-[var(--text-2)] hover:text-[var(--text)] transition-colors block"
+                          className="w-full text-left p-2 rounded-[8px] hover:bg-[var(--elev-2)] text-[12px] text-[var(--text-2)] hover:text-[var(--text)] transition-colors block"
                         >
                           <div className="font-medium text-[var(--text)]">{p.label}</div>
                           <span className="text-[10px] text-[var(--text-3)] uppercase font-mono">{p.category}</span>
@@ -539,7 +539,7 @@ export const Dock: React.FC = () => {
               <div className="relative" ref={lensMenuRef}>
                 <button
                   onClick={() => setLensMenuOpen(!isLensMenuOpen)}
-                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-[9999px] bg-[#121212] hover:bg-[#181818] border border-[var(--line)] text-[11px] font-mono tracking-wider text-[var(--text-2)] hover:text-[var(--text)] transition-colors"
+                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-[9999px] bg-[var(--elev-2)] hover:bg-[var(--elev-3)] border border-[var(--line)] text-[11px] font-mono tracking-wider text-[var(--text-2)] hover:text-[var(--text)] transition-colors"
                   title="Specialist Discipline Lens (⌘/)"
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-[var(--text)] opacity-70" />
@@ -549,7 +549,7 @@ export const Dock: React.FC = () => {
 
                 {/* Lens Menu Overlay */}
                 {isLensMenuOpen && (
-                  <div className="absolute left-0 bottom-full mb-2 w-72 p-2 rounded-[16px] bg-[#0A0A0A] border border-[var(--line-strong)] shadow-2xl backdrop-blur-xl z-50 animate-[wordReveal_150ms_ease-out]">
+                  <div className="absolute left-0 bottom-full mb-2 w-72 p-2 rounded-[16px] bg-[var(--elev-1)] border border-[var(--line-strong)] shadow-2xl backdrop-blur-xl z-50 animate-[wordReveal_150ms_ease-out]">
                     <div className="px-2 py-1 text-[10px] font-mono uppercase tracking-wider text-[var(--text-3)]">
                       Intelligence Lens Override
                     </div>
@@ -565,8 +565,8 @@ export const Dock: React.FC = () => {
                             }}
                             className={`w-full flex items-start gap-2.5 p-2 rounded-[10px] text-left transition-colors ${
                               isSelected
-                                ? 'bg-[#161616] text-[var(--text)]'
-                                : 'hover:bg-[#141414] text-[var(--text-2)]'
+                                ? 'bg-[var(--elev-3)] text-[var(--text)]'
+                                : 'hover:bg-[var(--elev-2)] text-[var(--text-2)]'
                             }`}
                           >
                             <div className="flex-1 min-w-0">
@@ -593,7 +593,7 @@ export const Dock: React.FC = () => {
                 className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
                   isListening
                     ? 'bg-[var(--text)] text-[var(--bg)] animate-pulse'
-                    : 'text-[var(--text-3)] hover:text-[var(--text)] hover:bg-[#141414]'
+                    : 'text-[var(--text-3)] hover:text-[var(--text)] hover:bg-[var(--elev-2)]'
                 }`}
                 title={isListening ? 'Listening (click to stop)...' : 'Voice Dictation'}
               >
@@ -604,7 +604,7 @@ export const Dock: React.FC = () => {
               {isStreaming ? (
                 <button
                   onClick={stopStreaming}
-                  className="w-8 h-8 rounded-full bg-[#1A1A1A] border border-[var(--line-strong)] text-[var(--text)] flex items-center justify-center hover:bg-[#222222] transition-colors"
+                  className="w-8 h-8 rounded-full bg-[var(--elev-2)] border border-[var(--line-strong)] text-[var(--text)] flex items-center justify-center hover:bg-[var(--elev-3)] transition-colors"
                   title="Stop generating (Esc)"
                 >
                   <div className="w-2.5 h-2.5 bg-[var(--text)] rounded-[2px]" />

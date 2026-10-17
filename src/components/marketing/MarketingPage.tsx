@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useChatStore, LensType } from '../../lib/store.ts';
 import { MARKETING_COPY } from '../../content/marketing.ts';
+import { toggleTheme } from '../../lib/theme.ts';
 import { Aura } from '../aura/Aura.tsx';
 import {
   ArrowRight,
@@ -17,6 +18,8 @@ import {
   Terminal,
   MessageSquare,
   Plus,
+  Sun,
+  Moon,
 } from 'lucide-react';
 
 const DEMO_LENSES: Array<{
@@ -188,6 +191,19 @@ export const MarketingPage: React.FC = () => {
     };
   }, [activeLensIndex, isPaused]);
 
+  const [currentTheme, setCurrentTheme] = useState<'dark' | 'light'>('dark');
+
+  useEffect(() => {
+    const updateThemeState = () => {
+      const isDark = document.documentElement.classList.contains('dark');
+      setCurrentTheme(isDark ? 'dark' : 'light');
+    };
+    updateThemeState();
+    const observer = new MutationObserver(updateThemeState);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
+
   const handleLaunchNewChat = () => {
     const id = newChat('Untitled Space');
     setActiveConversation(id);
@@ -196,11 +212,11 @@ export const MarketingPage: React.FC = () => {
 
   return (
     <div className="relative min-h-screen bg-[var(--bg)] text-[var(--text)] overflow-x-hidden select-none">
-      {/* Pure monochrome Aura - no white background light */}
+      {/* Pure monochrome Aura */}
       <Aura />
 
       {/* Top Floating Navigation */}
-      <nav className="fixed top-0 inset-x-0 z-50 h-14 px-6 md:px-12 flex items-center justify-between border-b border-[var(--line)] bg-[#000000]/80 backdrop-blur-md">
+      <nav className="fixed top-0 inset-x-0 z-50 h-14 px-6 md:px-12 flex items-center justify-between border-b border-[var(--line)] bg-[var(--bg)]/85 backdrop-blur-md">
         <div className="flex items-center gap-3">
           <span className="font-serif-display text-2xl tracking-tight font-normal">Noevix</span>
           <span className="font-mono-label hidden sm:inline px-2 py-0.5 rounded-[4px] bg-[var(--elev-1)]">
@@ -220,6 +236,17 @@ export const MarketingPage: React.FC = () => {
             className="text-[13px] text-[var(--text-2)] hover:text-[var(--text)] transition-colors px-2 py-1 font-mono text-[11px]"
           >
             Sign In
+          </button>
+          <button
+            onClick={toggleTheme}
+            className="w-8 h-8 rounded-full border border-[var(--line)] flex items-center justify-center text-[var(--text-2)] hover:text-[var(--text)] hover:bg-[var(--elev-1)] transition-colors"
+            title={currentTheme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+          >
+            {currentTheme === 'dark' ? (
+              <Sun className="w-3.5 h-3.5 transition-transform hover:rotate-45" />
+            ) : (
+              <Moon className="w-3.5 h-3.5 transition-transform hover:-rotate-12" />
+            )}
           </button>
           <button
             onClick={handleLaunchNewChat}
@@ -339,7 +366,7 @@ export const MarketingPage: React.FC = () => {
 
           {/* Locked Stage Area - Exactly 532px to fill the 580px shell without shifting the page */}
           <div
-            className="p-6 flex flex-col justify-between bg-[#000000] shrink-0 overflow-hidden"
+            className="p-6 flex flex-col justify-between bg-[var(--elev-1)] shrink-0 overflow-hidden"
             style={{ height: '532px', maxHeight: '532px', contain: 'strict' }}
           >
             {/* Prompt Box with Rigid Fixed Height */}
@@ -538,7 +565,7 @@ export const MarketingPage: React.FC = () => {
       </section>
 
       {/* ----------------- 8. FOOTER ----------------- */}
-      <footer className="relative z-10 py-12 px-6 border-t border-[var(--line)] bg-[#000000] text-center">
+      <footer className="relative z-10 py-12 px-6 border-t border-[var(--line)] bg-[var(--bg)] text-center">
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <span className="font-serif-display text-xl">Noevix</span>
